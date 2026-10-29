@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrandKraft ID - Personal Branding, CV & AI Logo Generator</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Cinzel for Luxury Headings & Plus Jakarta Sans for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                        cinzel: ['"Cinzel"', 'serif']
+                    },
+                    colors: {
+                        dark: {
+                            950: '#07080a',
+                            900: '#0b0c10',
+                            850: '#12141a',
+                            800: '#1a1d24',
+                            700: '#262a36'
+                        },
+                        gold: {
+                            100: '#fff8e1',
+                            300: '#f7e2a9',
+                            400: '#ebd080',
+                            500: '#d4af37', // Classic Metallic Gold
+                            600: '#b8860b',
+                            700: '#996515',
+                            800: '#734a08'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0c10;
+            color: #e2e8f0;
+        }
+
+        /* Gold Gradient Text & Elements */
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #fff2c5 0%, #d4af37 50%, #aa7c11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bg-gold-gradient {
+            background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #996515 100%);
+        }
+
+        .bg-gold-subtle {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(184, 134, 11, 0.05) 100%);
+        }
+
+        .border-gold-glow {
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.12);
+        }
+
+        .border-gold-glow:focus-within {
+            border-color: rgba(255, 215, 0, 0.7);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+        }
+
+        /* A4 Sheet Dimensions for Print & Preview */
+        .a4-sheet {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 16mm 18mm;
+            margin: 0 auto;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Print Override */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .a4-sheet {
+                width: 100% !important;
+                min-height: 100vh !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+                color: black !important;
+            }
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0c10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d38;
+            border-radius: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-dark-900 text-slate-200 antialiased selection:bg-gold-500 selection:text-black">
+
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- Toast Notification -->
+        <div v-if="toast.show" 
+             class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-dark-800 text-gold-100 px-5 py-3.5 rounded-xl shadow-2xl border border-gold-500/40 backdrop-blur-md transition-all duration-300">
+            <i :class="toast.icon || 'fa-solid fa-circle-check'" class="text-gold-500 text-lg"></i>
+            <span class="text-sm font-medium tracking-wide">{{ toast.message }}</span>
+        </div>
+
+        <!-- Navigation Bar -->
+        <header class="no-print sticky top-0 z-40 bg-dark-950/90 backdrop-blur-md border-b border-gold-500/20 shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    
+                    <!-- Logo & Brand -->
+                    <div class="flex items-center space-x-3.5 cursor-pointer" @click="activeTab = 'cv'">
+                        <div class="w-11 h-11 rounded-xl bg-gold-gradient p-0.5 shadow-lg shadow-gold-500/20">
+                            <div class="w-full h-full bg-dark-950 rounded-[10px] flex items-center justify-center font-cinzel font-black text-xl text-gold-400">
+                                B
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="font-cinzel text-xl font-bold tracking-wider text-gold-gradient">BRANDKRAFT</h1>
+                            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Luxury Personal Branding Suite</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <nav class="hidden lg:flex items-center space-x-1.5 bg-dark-900/80 p-1.5 rounded-2xl border border-gold-500/20">
+                        <button @click="activeTab = 'cv'" 
+                                :class="activeTab === 'cv' ? 'bg-gold-gradient text-black font-bold shadow-lg shadow-gold-500/20' : 'text-slate-300 hover:text-gold-400 hover:bg-dark-800'"
+                                class="px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice"></i> Pembuat CV
+                        </button>
+
+                        <button @click="activeTab = 'logo'" 
+                                :class="activeTab === 'logo' ? 'bg-gold-gradient text-black font-bold shadow-lg shadow-gold-500/20' : 'text-slate-300 hover:text-gold-400 hover:bg-dark-800'"
+                                class="px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Pembuat Logo AI
+                        </button>
+
+                        <button @click="activeTab = 'letter'" 
+                                :class="activeTab === 'letter' ? 'bg-gold-gradient text-black font-bold shadow-lg shadow-gold-500/20' : 'text-slate-300 hover:text-gold-400 hover:bg-dark-800'"
+                                class="px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-envelope-open-text"></i> Surat Lamaran
+                        </button>
+
+                        <button @click="activeTab = 'brand'" 
+                                :class="activeTab === 'brand' ? 'bg-gold-gradient text-black font-bold shadow-lg shadow-gold-500/20' : 'text-slate-300 hover:text-gold-400 hover:bg-dark-800'"
+                                class="px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-crown"></i> Brand Hub
+                        </button>
+
+                        <button @click="activeTab = 'preview'" 
+                                :class="activeTab === 'preview' ? 'bg-gold-gradient text-black font-bold shadow-lg shadow-gold-500/20' : 'text-slate-300 hover:text-gold-400 hover:bg-dark-800'"
+                                class="px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Cetak PDF
+                        </button>
+                    </nav>
+
+                    <!-- Utility Buttons -->
+                    <div class="flex items-center space-x-2.5">
+                        <label class="cursor-pointer bg-dark-850 hover:bg-dark-800 text-gold-400 hover:text-gold-300 px-3 py-2 rounded-xl text-xs font-semibold transition border border-gold-500/30 flex items-center gap-2" title="Impor JSON">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span class="hidden sm:inline">Impor</span>
+                            <input type="file" @change="importJSON" accept=".json" class="hidden">
+                        </label>
+
+                        <button @click="exportJSON" class="bg-dark-850 hover:bg-dark-800 text-gold-400 hover:text-gold-300 px-3 py-2 rounded-xl text-xs font-semibold transition border border-gold-500/30 flex items-center gap-2" title="Simpan Draf JSON">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span class="hidden sm:inline">Simpan Draf</span>
+                        </button>
+
+                        <button @click="triggerPrint" class="bg-gold-gradient hover:opacity-90 text-black font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 shadow-lg shadow-gold-500/20">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Cetak PDF</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Mobile Navigation Row -->
+                <div class="flex lg:hidden overflow-x-auto pb-3 pt-1 space-x-2 scrollbar-none">
+                    <button @click="activeTab = 'cv'" :class="activeTab === 'cv' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-300 bg-dark-850'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Pembuat CV</button>
+                    <button @click="activeTab = 'logo'" :class="activeTab === 'logo' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-300 bg-dark-850'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Pembuat Logo AI</button>
+                    <button @click="activeTab = 'letter'" :class="activeTab === 'letter' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-300 bg-dark-850'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Surat Lamaran</button>
+                    <button @click="activeTab = 'brand'" :class="activeTab === 'brand' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-300 bg-dark-850'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Brand Hub</button>
+                    <button @click="activeTab = 'preview'" :class="activeTab === 'preview' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-300 bg-dark-850'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Cetak PDF</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+            <!-- ================= TAB 1: PEMBUAT CV ================= -->
+            <div v-if="activeTab === 'cv'" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left: Form Controls (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- Header Card & Theme Selector -->
+                    <div class="bg-dark-850 p-5 rounded-2xl border border-gold-500/30 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-cinzel text-lg font-bold text-gold-gradient flex items-center gap-2">
+                                <i class="fa-solid fa-pen-nib text-gold-400"></i> Editor CV Eksklusif
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">Sesuaikan data Anda. Hasil pratinjau diperbarui secara langsung.</p>
+                        </div>
+                        
+                        <!-- Theme Selector -->
+                        <div class="flex items-center gap-1 bg-dark-900 p-1.5 rounded-xl border border-gold-500/20">
+                            <button @click="cvTheme = 'royalty'" 
+                                    :class="cvTheme === 'royalty' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400 hover:text-gold-300'"
+                                    class="px-2.5 py-1 text-xs rounded-lg transition">
+                                Royalty Gold
+                            </button>
+                            <button @click="cvTheme = 'midnight'" 
+                                    :class="cvTheme === 'midnight' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400 hover:text-gold-300'"
+                                    class="px-2.5 py-1 text-xs rounded-lg transition">
+                                Midnight Clean
+                            </button>
+                            <button @click="cvTheme = 'accent'" 
+                                    :class="cvTheme === 'accent' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400 hover:text-gold-300'"
+                                    class="px-2.5 py-1 text-xs rounded-lg transition">
+                                Golden Accent
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Form Sections -->
+                    
+                    <!-- 1. Data Diri & Logo integration -->
+                    <div class="bg-dark-850 rounded-2xl border border-gold-500/20 overflow-hidden shadow-lg">
+                        <div class="bg-dark-800/80 px-5 py-4 border-b border-gold-500/20 flex justify-between items-center cursor-pointer" @click="sections.personal = !sections.personal">
+                            <h3 class="font-semibold text-gold-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-gold-500"></i> Profil & Kontak Utama
+                            </h3>
+                            <i :class="sections.personal ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-xs text-gold-500"></i>
+                        </div>
+                        <div v-show="sections.personal" class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Lengkap & Gelar</label>
+                                <input type="text" v-model="cv.personal.fullName" placeholder="mis. Alexander Vance, M.B.A." class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Gelar Profesional / Jabatan Target</label>
+                                <input type="text" v-model="cv.personal.title" placeholder="mis. Chief Technology Officer" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Email</label>
+                                <input type="email" v-model="cv.personal.email" placeholder="alexander@vance.com" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Telepon / WhatsApp</label>
+                                <input type="text" v-model="cv.personal.phone" placeholder="+62 811 8888 9999" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Lokasi (Kota, Negara)</label>
+                                <input type="text" v-model="cv.personal.location" placeholder="Jakarta Pusat, Indonesia" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Profil LinkedIn</label>
+                                <input type="text" v-model="cv.personal.linkedin" placeholder="linkedin.com/in/alexandervance" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">URL Foto Profil (Opsional)</label>
+                                <input type="text" v-model="cv.personal.photo" placeholder="https://..." class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Website / Portofolio</label>
+                                <input type="text" v-model="cv.personal.website" placeholder="vance-executive.com" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                            </div>
+                            
+                            <!-- Attached AI Logo Badge Indicator -->
+                            <div class="sm:col-span-2 p-3 bg-dark-900 rounded-xl border border-gold-500/30 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-black rounded-lg border border-gold-500/40 p-1 flex items-center justify-center overflow-hidden" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gold-400">Logo Vektor Brand</div>
+                                        <div class="text-[10px] text-slate-400" v-if="cv.personal.logoSvg">Logo kustom aktif di header CV</div>
+                                        <div class="text-[10px] text-slate-400" v-else>Logo standar aktif. Buat di tab 'Pembuat Logo AI'.</div>
+                                    </div>
+                                </div>
+                                <button @click="activeTab = 'logo'" class="text-xs text-gold-400 hover:underline font-semibold flex items-center gap-1">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Edit Logo AI
+                                </button>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Ringkasan Profil Eksekutif</label>
+                                <textarea v-model="cv.personal.summary" rows="3" placeholder="Tuliskan 2-3 kalimat yang menggambarkan keahlian utama dan nilai tambah profesional Anda..." class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Pengalaman Kerja -->
+                    <div class="bg-dark-850 rounded-2xl border border-gold-500/20 overflow-hidden shadow-lg">
+                        <div class="bg-dark-800/80 px-5 py-4 border-b border-gold-500/20 flex justify-between items-center cursor-pointer" @click="sections.experience = !sections.experience">
+                            <h3 class="font-semibold text-gold-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-briefcase text-gold-500"></i> Pengalaman Kerja
+                            </h3>
+                            <i :class="sections.experience ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-xs text-gold-500"></i>
+                        </div>
+                        <div v-show="sections.experience" class="p-5 space-y-4">
+                            <div v-for="(exp, idx) in cv.experiences" :key="exp.id" class="p-4 border border-gold-500/20 rounded-xl bg-dark-900/60 space-y-3 relative">
+                                <button @click="removeExperience(idx)" class="absolute top-3 right-3 text-slate-500 hover:text-rose-400 text-xs p-1" title="Hapus">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Jabatan / Posisi</label>
+                                        <input type="text" v-model="exp.role" placeholder="Vice President of Engineering" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Perusahaan</label>
+                                        <input type="text" v-model="exp.company" placeholder="Fintech Global Corp" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Periode</label>
+                                        <input type="text" v-model="exp.period" placeholder="2021 - Sekarang" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1">Tanggung Jawab & Pencapaian</label>
+                                    <textarea v-model="exp.description" rows="3" placeholder="• Memimpin tim engineering 30+ orang...&#10;• Menghemat efisiensi infrastruktur cloud 40%..." class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none"></textarea>
+                                </div>
+                            </div>
+
+                            <button @click="addExperience" class="w-full py-2.5 border border-dashed border-gold-500/40 hover:border-gold-400 text-gold-400 hover:bg-gold-500/10 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Tambah Pengalaman Kerja
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Pendidikan -->
+                    <div class="bg-dark-850 rounded-2xl border border-gold-500/20 overflow-hidden shadow-lg">
+                        <div class="bg-dark-800/80 px-5 py-4 border-b border-gold-500/20 flex justify-between items-center cursor-pointer" @click="sections.education = !sections.education">
+                            <h3 class="font-semibold text-gold-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-graduation-cap text-gold-500"></i> Riwayat Pendidikan
+                            </h3>
+                            <i :class="sections.education ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-xs text-gold-500"></i>
+                        </div>
+                        <div v-show="sections.education" class="p-5 space-y-4">
+                            <div v-for="(edu, idx) in cv.education" :key="edu.id" class="p-4 border border-gold-500/20 rounded-xl bg-dark-900/60 space-y-3 relative">
+                                <button @click="removeEducation(idx)" class="absolute top-3 right-3 text-slate-500 hover:text-rose-400 text-xs p-1" title="Hapus">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Gelar & Jurusan</label>
+                                        <input type="text" v-model="edu.degree" placeholder="Master of Business Administration" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Institusi</label>
+                                        <input type="text" v-model="edu.institution" placeholder="Stanford University" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">Tahun Lulus</label>
+                                        <input type="text" v-model="edu.period" placeholder="2018 - 2020" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-400">IPK / Catatan (Opsional)</label>
+                                        <input type="text" v-model="edu.score" placeholder="GPA: 3.92 / Cum Laude" class="w-full px-3 py-1.5 text-sm bg-dark-950 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button @click="addEducation" class="w-full py-2.5 border border-dashed border-gold-500/40 hover:border-gold-400 text-gold-400 hover:bg-gold-500/10 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Tambah Riwayat Pendidikan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4. Keahlian & Bahasa -->
+                    <div class="bg-dark-850 rounded-2xl border border-gold-500/20 overflow-hidden shadow-lg">
+                        <div class="bg-dark-800/80 px-5 py-4 border-b border-gold-500/20 flex justify-between items-center cursor-pointer" @click="sections.skills = !sections.skills">
+                            <h3 class="font-semibold text-gold-400 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-gold-500"></i> Keahlian & Penguasaan Bahasa
+                            </h3>
+                            <i :class="sections.skills ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-xs text-gold-500"></i>
+                        </div>
+                        <div v-show="sections.skills" class="p-5 space-y-6">
+                            
+                            <div>
+                                <h4 class="text-xs font-bold text-gold-400 uppercase tracking-wider mb-3">Keahlian Utamanya</h4>
+                                <div class="space-y-3">
+                                    <div v-for="(sk, idx) in cv.skills" :key="sk.id" class="flex items-center gap-2">
+                                        <input type="text" v-model="sk.name" placeholder="mis. Strategic Leadership" class="flex-1 px-3 py-1.5 text-sm bg-dark-900 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                        <select v-model="sk.level" class="px-3 py-1.5 text-sm bg-dark-900 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                            <option value="Dasar">Dasar</option>
+                                            <option value="Menengah">Menengah</option>
+                                            <option value="Mahir">Mahir</option>
+                                            <option value="Ekspert">Ekspert</option>
+                                        </select>
+                                        <button @click="removeSkill(idx)" class="text-slate-500 hover:text-rose-400 p-2">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button @click="addSkill" class="mt-3 text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                                    <i class="fa-solid fa-plus-circle"></i> Tambah Keahlian
+                                </button>
+                            </div>
+
+                            <div class="border-t border-gold-500/10 pt-4">
+                                <h4 class="text-xs font-bold text-gold-400 uppercase tracking-wider mb-3">Bahasa</h4>
+                                <div class="space-y-3">
+                                    <div v-for="(lang, idx) in cv.languages" :key="lang.id" class="flex items-center gap-2">
+                                        <input type="text" v-model="lang.name" placeholder="Bahasa Inggris" class="flex-1 px-3 py-1.5 text-sm bg-dark-900 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                        <input type="text" v-model="lang.level" placeholder="Fasih / Native" class="w-1/3 px-3 py-1.5 text-sm bg-dark-900 border border-gold-500/30 rounded-lg text-slate-100 focus:outline-none">
+                                        <button @click="removeLanguage(idx)" class="text-slate-500 hover:text-rose-400 p-2">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button @click="addLanguage" class="mt-3 text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                                    <i class="fa-solid fa-plus-circle"></i> Tambah Bahasa
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right: Realtime Canvas Preview (5 cols) -->
+                <div class="lg:col-span-5 relative">
+                    <div class="sticky top-24">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-gold-400 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                                Live Preview Realtime
+                            </span>
+                            <span class="text-xs text-slate-400">Tema: <span class="text-gold-300 font-semibold">{{ cvThemeName }}</span></span>
+                        </div>
+
+                        <!-- Miniature Render Card -->
+                        <div class="bg-dark-950 p-4 rounded-2xl border border-gold-500/30 shadow-2xl overflow-y-auto max-h-[calc(100vh-140px)]">
+                            
+                            <!-- RENDER TEMPLATE 1: ROYALTY GOLD EXECUTIVE -->
+                            <div v-if="cvTheme === 'royalty'" class="bg-dark-900 text-slate-200 p-6 rounded-xl border border-gold-500/30 text-[11px] leading-relaxed shadow-lg">
+                                <!-- Top Bar with Logo & Info -->
+                                <div class="flex items-center justify-between border-b border-gold-500/40 pb-4 mb-4">
+                                    <div>
+                                        <h1 class="font-cinzel text-lg font-black text-gold-gradient uppercase tracking-wider">{{ cv.personal.fullName || 'NAMA LENGKAP' }}</h1>
+                                        <p class="text-xs text-gold-300 font-medium tracking-wide mt-0.5">{{ cv.personal.title || 'Gelar / Jabatan' }}</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-lg bg-black p-1 border border-gold-500/50 flex items-center justify-center overflow-hidden shrink-0" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                                </div>
+
+                                <!-- Contact Bar -->
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-[10px] text-slate-400 pb-3 border-b border-slate-800 mb-4">
+                                    <span v-if="cv.personal.email"><i class="fa-solid fa-envelope text-gold-500 mr-1"></i>{{ cv.personal.email }}</span>
+                                    <span v-if="cv.personal.phone"><i class="fa-solid fa-phone text-gold-500 mr-1"></i>{{ cv.personal.phone }}</span>
+                                    <span v-if="cv.personal.location"><i class="fa-solid fa-location-dot text-gold-500 mr-1"></i>{{ cv.personal.location }}</span>
+                                    <span v-if="cv.personal.linkedin"><i class="fa-brands fa-linkedin text-gold-500 mr-1"></i>{{ cv.personal.linkedin }}</span>
+                                </div>
+
+                                <!-- Summary -->
+                                <div v-if="cv.personal.summary" class="mb-4">
+                                    <h2 class="font-cinzel text-xs font-bold text-gold-400 border-b border-gold-500/30 pb-0.5 mb-1.5 tracking-wider">RINGKASAN EKSEKUTIF</h2>
+                                    <p class="text-slate-300 whitespace-pre-line text-[10.5px] leading-relaxed">{{ cv.personal.summary }}</p>
+                                </div>
+
+                                <!-- Experience -->
+                                <div v-if="cv.experiences.length" class="mb-4">
+                                    <h2 class="font-cinzel text-xs font-bold text-gold-400 border-b border-gold-500/30 pb-0.5 mb-2 tracking-wider">PENGALAMAN KERJA</h2>
+                                    <div class="space-y-3">
+                                        <div v-for="exp in cv.experiences" :key="exp.id">
+                                            <div class="flex justify-between font-bold text-slate-100">
+                                                <span>{{ exp.role }} — <span class="text-gold-400 font-semibold">{{ exp.company }}</span></span>
+                                                <span class="text-[9px] text-slate-400 font-normal">{{ exp.period }}</span>
+                                            </div>
+                                            <p class="text-slate-300 mt-1 whitespace-pre-line text-[10px]">{{ exp.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Education -->
+                                <div v-if="cv.education.length" class="mb-4">
+                                    <h2 class="font-cinzel text-xs font-bold text-gold-400 border-b border-gold-500/30 pb-0.5 mb-2 tracking-wider">RIWAYAT PENDIDIKAN</h2>
+                                    <div class="space-y-2">
+                                        <div v-for="edu in cv.education" :key="edu.id" class="flex justify-between">
+                                            <div>
+                                                <span class="font-bold text-slate-100">{{ edu.degree }}</span>
+                                                <span class="text-slate-400">, {{ edu.institution }}</span>
+                                                <div v-if="edu.score" class="text-[9px] text-gold-400">{{ edu.score }}</div>
+                                            </div>
+                                            <span class="text-[9px] text-slate-400">{{ edu.period }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Skills & Languages -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div v-if="cv.skills.length">
+                                        <h2 class="font-cinzel text-xs font-bold text-gold-400 border-b border-gold-500/30 pb-0.5 mb-1.5 tracking-wider">KEAHLIAN</h2>
+                                        <div class="flex flex-wrap gap-1">
+                                            <span v-for="sk in cv.skills" :key="sk.id" class="bg-gold-500/10 border border-gold-500/30 text-gold-300 text-[9px] px-1.5 py-0.5 rounded">
+                                                {{ sk.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div v-if="cv.languages.length">
+                                        <h2 class="font-cinzel text-xs font-bold text-gold-400 border-b border-gold-500/30 pb-0.5 mb-1.5 tracking-wider">BAHASA</h2>
+                                        <div class="space-y-0.5 text-[10px]">
+                                            <div v-for="lang in cv.languages" :key="lang.id" class="flex justify-between text-slate-300">
+                                                <span>{{ lang.name }}</span>
+                                                <span class="text-gold-400 text-[9px]">{{ lang.level }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TEMPLATE 2: MIDNIGHT CLEAN -->
+                            <div v-else-if="cvTheme === 'midnight'" class="bg-black text-slate-200 p-6 rounded-xl border border-slate-800 text-[11px] leading-relaxed">
+                                <div class="text-center pb-4 mb-4 border-b border-gold-500/20">
+                                    <div class="w-12 h-12 mx-auto mb-2 bg-dark-900 rounded-full border border-gold-500 p-1 flex items-center justify-center overflow-hidden" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                                    <h1 class="text-xl font-bold tracking-widest text-gold-400 uppercase font-cinzel">{{ cv.personal.fullName }}</h1>
+                                    <p class="text-xs text-slate-400 italic mt-0.5">{{ cv.personal.title }}</p>
+                                    <div class="flex justify-center flex-wrap gap-3 text-[9.5px] text-slate-400 mt-2">
+                                        <span v-if="cv.personal.email">{{ cv.personal.email }}</span>
+                                        <span v-if="cv.personal.phone">• {{ cv.personal.phone }}</span>
+                                        <span v-if="cv.personal.location">• {{ cv.personal.location }}</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="cv.personal.summary" class="mb-4">
+                                    <p class="text-slate-300 italic text-justify leading-relaxed">{{ cv.personal.summary }}</p>
+                                </div>
+
+                                <div v-if="cv.experiences.length" class="mb-4">
+                                    <h2 class="text-xs font-bold text-gold-400 border-b border-slate-800 pb-1 mb-2 uppercase tracking-widest">Pengalaman Profesional</h2>
+                                    <div class="space-y-2.5">
+                                        <div v-for="exp in cv.experiences" :key="exp.id">
+                                            <div class="flex justify-between font-bold text-slate-200">
+                                                <span>{{ exp.role }} <span class="text-gold-500 font-normal">| {{ exp.company }}</span></span>
+                                                <span class="text-[9px] text-slate-500">{{ exp.period }}</span>
+                                            </div>
+                                            <p class="text-slate-400 text-[10px] mt-0.5 whitespace-pre-line">{{ exp.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="cv.education.length" class="mb-4">
+                                    <h2 class="text-xs font-bold text-gold-400 border-b border-slate-800 pb-1 mb-2 uppercase tracking-widest">Pendidikan</h2>
+                                    <div v-for="edu in cv.education" :key="edu.id" class="flex justify-between">
+                                        <span><strong class="text-slate-200">{{ edu.degree }}</strong>, {{ edu.institution }}</span>
+                                        <span class="text-[9px] text-slate-500">{{ edu.period }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TEMPLATE 3: GOLDEN ACCENT -->
+                            <div v-else-if="cvTheme === 'accent'" class="bg-dark-850 text-slate-200 p-6 rounded-xl border border-gold-500/20 text-[11px] leading-relaxed">
+                                <div class="bg-gold-gradient p-4 -m-6 mb-5 rounded-t-xl text-black flex items-center justify-between">
+                                    <div>
+                                        <h1 class="font-cinzel text-lg font-black uppercase">{{ cv.personal.fullName }}</h1>
+                                        <p class="text-xs font-semibold text-slate-900">{{ cv.personal.title }}</p>
+                                    </div>
+                                    <div class="w-10 h-10 bg-black rounded-lg p-1 flex items-center justify-center overflow-hidden shrink-0 border border-black" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-3 text-[10px] text-gold-300 pb-3 border-b border-gold-500/20 mb-4">
+                                    <span v-if="cv.personal.email"><i class="fa-solid fa-envelope mr-1"></i>{{ cv.personal.email }}</span>
+                                    <span v-if="cv.personal.phone"><i class="fa-solid fa-phone mr-1"></i>{{ cv.personal.phone }}</span>
+                                    <span v-if="cv.personal.location"><i class="fa-solid fa-location-dot mr-1"></i>{{ cv.personal.location }}</span>
+                                </div>
+
+                                <div v-if="cv.personal.summary" class="mb-4">
+                                    <h2 class="font-bold text-gold-400 text-xs uppercase mb-1">Profil Singkat</h2>
+                                    <p class="text-slate-300 text-[10px] leading-relaxed">{{ cv.personal.summary }}</p>
+                                </div>
+
+                                <div v-if="cv.experiences.length" class="mb-4">
+                                    <h2 class="font-bold text-gold-400 text-xs uppercase border-b border-gold-500/20 pb-0.5 mb-2">Pengalaman Kerja</h2>
+                                    <div class="space-y-3">
+                                        <div v-for="exp in cv.experiences" :key="exp.id">
+                                            <div class="flex justify-between font-bold text-slate-100">
+                                                <span>{{ exp.role }}</span>
+                                                <span class="text-gold-400 font-normal text-[9px]">{{ exp.period }}</span>
+                                            </div>
+                                            <div class="text-[9.5px] text-slate-400 font-medium">{{ exp.company }}</div>
+                                            <p class="text-slate-300 text-[9.5px] mt-1 whitespace-pre-line">{{ exp.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= TAB 2: PEMBUAT LOGO AI (NEW) ================= -->
+            <div v-if="activeTab === 'logo'" class="space-y-8">
+                
+                <!-- Hero Header -->
+                <div class="bg-gradient-to-r from-dark-900 via-dark-850 to-dark-950 p-6 sm:p-8 rounded-3xl border border-gold-500/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="max-w-2xl">
+                        <span class="px-3 py-1 bg-gold-500/10 text-gold-400 text-xs font-semibold rounded-full border border-gold-500/30 mb-3 inline-block">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Powered by Gemini AI Vector Engine
+                        </span>
+                        <h2 class="font-cinzel text-2xl sm:text-3xl font-black text-gold-gradient">PEMBUAT LOGO VEKTOR AI</h2>
+                        <p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
+                            Buat logo monogram luxury & simbol merek berbasis grafik Vektor SVG siap pakai. Anda dapat menggunakan prompt kecerdasan buatan Gemini API atau pembuat preset instan.
+                        </p>
+                    </div>
+
+                    <!-- Gemini API Key Input Widget -->
+                    <div class="w-full md:w-80 bg-dark-900/90 p-4 rounded-2xl border border-gold-500/30 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-gold-400"><i class="fa-solid fa-key mr-1"></i> Gemini API Key</span>
+                            <span class="text-[10px] text-slate-400">Opsional</span>
+                        </div>
+                        <input type="password" v-model="geminiApiKey" placeholder="Masukkan Gemini API Key..." class="w-full px-3 py-1.5 text-xs bg-dark-950 border border-gold-500/30 rounded-xl text-slate-200 focus:outline-none focus:border-gold-500">
+                        <p class="text-[9.5px] text-slate-400">
+                            *Jika dikosongkan, Anda tetap dapat menggunakan **Preset Generator Instant** bawaan.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Generator Form & SVG Canvas Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Left: Control Form (5 cols) -->
+                    <div class="lg:col-span-5 bg-dark-850 p-6 rounded-2xl border border-gold-500/30 shadow-xl space-y-4">
+                        <h3 class="font-cinzel font-bold text-gold-gradient text-base border-b border-gold-500/20 pb-2">
+                            <i class="fa-solid fa-sliders text-gold-400 mr-1"></i> Parameter Desain Logo
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Nama / Inisial Brand</label>
+                            <input type="text" v-model="logoForm.brandName" placeholder="mis. AV / Vance" class="w-full px-3.5 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Tagline / Sub-teks (Opsional)</label>
+                            <input type="text" v-model="logoForm.tagline" placeholder="mis. LUXURY ARCHITECT" class="w-full px-3.5 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Gaya Visual Logo</label>
+                            <select v-model="logoForm.style" class="w-full px-3.5 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                                <option value="Monogram Luxury Crest">Monogram Luxury Crest</option>
+                                <option value="Geometric Minimalist Badge">Geometric Minimalist Badge</option>
+                                <option value="Abstract Shield Emblem">Abstract Shield Emblem</option>
+                                <option value="Modern Tech Emblem">Modern Tech Emblem</option>
+                                <option value="Minimalist Typography">Minimalist Typography</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Simbol / Ide Unsur Visual</label>
+                            <input type="text" v-model="logoForm.symbol" placeholder="mis. Mahkota, Perisai, Bintang, Diamon" class="w-full px-3.5 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none focus:border-gold-500">
+                        </div>
+
+                        <!-- Generator Action Buttons -->
+                        <div class="pt-2 space-y-2">
+                            <!-- Generate via Gemini API -->
+                            <button @click="generateLogoWithAI" :disabled="isGeneratingLogo" class="w-full py-3 bg-gold-gradient hover:opacity-90 text-black font-bold text-xs rounded-xl transition shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                                <i v-if="isGeneratingLogo" class="fa-solid fa-spinner fa-spin"></i>
+                                <i v-else class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>{{ isGeneratingLogo ? 'Menjana Vektor AI...' : 'Buat Logo Vektor AI (Gemini)' }}</span>
+                            </button>
+
+                            <!-- Fast Offline Preset -->
+                            <button @click="generatePresetLogo" class="w-full py-2.5 bg-dark-800 hover:bg-dark-750 text-gold-400 font-semibold text-xs rounded-xl border border-gold-500/30 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bolt"></i> Generate Preset Instan Offline
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Interactive Canvas & SVG Preview (7 cols) -->
+                    <div class="lg:col-span-7 space-y-4">
+                        
+                        <!-- Canvas Card -->
+                        <div class="bg-dark-850 p-6 rounded-2xl border border-gold-500/30 shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-gold-500/20 pb-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gold-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-vector-square"></i> Canvas Vektor SVG
+                                </span>
+                                
+                                <!-- Background Color Controls -->
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-[10px] text-slate-400">Latar:</span>
+                                    <button @click="canvasBg = 'dark'" :class="canvasBg === 'dark' ? 'border-gold-400' : 'border-slate-700'" class="w-5 h-5 bg-black rounded-full border-2" title="Hitam Pekat"></button>
+                                    <button @click="canvasBg = 'navy'" :class="canvasBg === 'navy' ? 'border-gold-400' : 'border-slate-700'" class="w-5 h-5 bg-dark-900 rounded-full border-2" title="Dark Obsidian"></button>
+                                    <button @click="canvasBg = 'gold'" :class="canvasBg === 'gold' ? 'border-gold-400' : 'border-slate-700'" class="w-5 h-5 bg-gold-700 rounded-full border-2" title="Aksen Emas"></button>
+                                    <button @click="canvasBg = 'transparent'" :class="canvasBg === 'transparent' ? 'border-gold-400' : 'border-slate-700'" class="w-5 h-5 bg-slate-800 rounded-full border-2 relative overflow-hidden" title="Transparan">
+                                        <div class="w-full h-full bg-slate-700/50"></div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- SVG Display Viewport -->
+                            <div class="w-full h-72 rounded-2xl flex items-center justify-center p-6 border border-gold-500/20 transition-all duration-300 relative overflow-hidden"
+                                 :class="canvasBgClass">
+                                
+                                <div v-if="currentSvg" class="w-full h-full flex items-center justify-center" v-html="currentSvg"></div>
+                                <div v-else class="text-center text-slate-500 space-y-2">
+                                    <i class="fa-solid fa-compass-drafting text-3xl text-gold-500/40"></i>
+                                    <p class="text-xs">Klik tombol **Generate Logo** untuk melihat wujud vektor di sini.</p>
+                                </div>
+                            </div>
+
+                            <!-- Logo Actions & Export Options -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                                <button @click="applyLogoToCV" :disabled="!currentSvg" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow">
+                                    <i class="fa-solid fa-check-circle"></i> Terapkan ke CV
+                                </button>
+                                <button @click="downloadSVG" :disabled="!currentSvg" class="py-2.5 bg-dark-800 hover:bg-dark-750 text-gold-400 border border-gold-500/30 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-download"></i> Unduh File SVG
+                                </button>
+                                <button @click="copySvgCode" :disabled="!currentSvg" class="py-2.5 bg-dark-800 hover:bg-dark-750 text-gold-400 border border-gold-500/30 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-code"></i> Salin Kode SVG
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================= TAB 3: SURAT LAMARAN KERJA ================= -->
+            <div v-if="activeTab === 'letter'" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="bg-dark-850 p-5 rounded-2xl border border-gold-500/30 shadow-xl">
+                        <h2 class="font-cinzel text-lg font-bold text-gold-gradient flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-feather-pointed text-gold-400"></i> Generator Surat Lamaran
+                        </h2>
+                        <p class="text-xs text-slate-400">Buat surat lamaran eksklusif disesuaikan dengan posisi target Anda.</p>
+                        
+                        <div class="mt-4 flex gap-2 p-1.5 bg-dark-900 rounded-xl border border-gold-500/20">
+                            <button @click="letter.style = 'formal'" 
+                                    :class="letter.style === 'formal' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400'"
+                                    class="flex-1 py-1.5 text-xs rounded-lg transition">
+                                Eksekutif Formal
+                            </button>
+                            <button @click="letter.style = 'startup'" 
+                                    :class="letter.style === 'startup' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400'"
+                                    class="flex-1 py-1.5 text-xs rounded-lg transition">
+                                Modern Inovatif
+                            </button>
+                            <button @click="letter.style = 'concise'" 
+                                    :class="letter.style === 'concise' ? 'bg-gold-gradient text-black font-bold' : 'text-slate-400'"
+                                    class="flex-1 py-1.5 text-xs rounded-lg transition">
+                                Direct Ringkas
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark-850 p-5 rounded-2xl border border-gold-500/20 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Tanggal Surat</label>
+                                <input type="text" v-model="letter.date" placeholder="29 Oktober 2026" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Posisi Target</label>
+                                <input type="text" v-model="letter.position" placeholder="Vice President of Engineering" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Perusahaan Target</label>
+                                <input type="text" v-model="letter.companyName" placeholder="PT Global Digital Holdings" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Penerima / HRD</label>
+                                <input type="text" v-model="letter.hrName" placeholder="Dewan Direksi & Rekrutmen" class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Pencapaian / Keunggulan Utama Anda</label>
+                            <textarea v-model="letter.keyHighlight" rows="2" placeholder="Pengalaman 10+ tahun memimpin transformasi teknologi dengan ROI terukur..." class="w-full px-3 py-2 text-sm bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Letter Paper Preview -->
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gold-400">Pratinjau Surat Dokumen</span>
+                        <button @click="copyLetterToClipboard" class="px-3 py-1.5 bg-dark-850 hover:bg-dark-800 text-gold-400 border border-gold-500/30 font-semibold text-xs rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i> Salin Teks
+                        </button>
+                    </div>
+
+                    <div class="bg-dark-900 p-8 rounded-2xl border border-gold-500/30 text-sm text-slate-200 space-y-4 leading-relaxed font-sans shadow-xl min-h-[480px]">
+                        <div class="flex justify-between items-start border-b border-gold-500/20 pb-4">
+                            <div>
+                                <div class="font-cinzel text-base font-bold text-gold-400">{{ cv.personal.fullName || '[Nama Anda]' }}</div>
+                                <div class="text-xs text-slate-400">{{ cv.personal.title }}</div>
+                            </div>
+                            <div class="w-10 h-10 bg-black rounded p-1 border border-gold-500/40" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                        </div>
+
+                        <div class="text-right text-xs text-slate-400">
+                            {{ cv.personal.location || 'Jakarta' }}, {{ letter.date }}
+                        </div>
+
+                        <div>
+                            <p class="font-semibold text-gold-300">Hal: Lamaran Pekerjaan – {{ letter.position }}</p>
+                            <p class="mt-2">Kepada Yth.</p>
+                            <p class="font-medium text-slate-100">{{ letter.hrName }}</p>
+                            <p class="font-medium text-gold-400">{{ letter.companyName }}</p>
+                        </div>
+
+                        <div class="space-y-3 pt-2 text-slate-300 text-xs leading-relaxed">
+                            <p>Dengan hormat,</p>
+                            <p>
+                                Melalui surat ini, saya bermaksud untuk mengajukan diri guna mengisi posisi <strong>{{ letter.position }}</strong> di <strong>{{ letter.companyName }}</strong>.
+                            </p>
+                            <p>
+                                Sebagai seorang {{ cv.personal.title }}, {{ letter.keyHighlight }}
+                            </p>
+                            <p>
+                                Bersama surat ini saya sertakan CV dan kualifikasi lengkap. Saya menyambut baik kesempatan diskusi lebih lanjut.
+                            </p>
+                            <p>Atas perhatian dan kesempatan Anda, saya ucapkan terima kasih.</p>
+                        </div>
+
+                        <div class="pt-4">
+                            <p class="text-xs text-slate-400">Hormat saya,</p>
+                            <p class="font-bold text-gold-400 font-cinzel mt-6 text-sm">{{ cv.personal.fullName }}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= TAB 4: BRAND HUB & ELEVATOR PITCH ================= -->
+            <div v-if="activeTab === 'brand'" class="max-w-5xl mx-auto space-y-8">
+                
+                <div class="bg-gradient-to-r from-dark-900 via-dark-850 to-dark-950 p-8 rounded-3xl border border-gold-500/30 shadow-2xl">
+                    <span class="px-3 py-1 bg-gold-500/10 text-gold-400 text-xs font-semibold rounded-full border border-gold-500/30 mb-3 inline-block">Brand Kraft Master Executive</span>
+                    <h2 class="font-cinzel text-2xl sm:text-3xl font-black text-gold-gradient">ELEVATOR PITCH & PERSONAL BRANDING</h2>
+                    <p class="text-slate-300 text-xs sm:text-sm mt-2">Dapatkan kalimat perkenalan berdurasi 30 detik untuk kebutuhan networking, bio LinkedIn, dan salam pembuka wawancara.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Form -->
+                    <div class="lg:col-span-5 bg-dark-850 p-6 rounded-2xl border border-gold-500/30 shadow-xl space-y-4">
+                        <h3 class="font-cinzel font-bold text-gold-400 text-sm">Input Parameter Branding</h3>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Peran / Profesi Utama</label>
+                            <input type="text" v-model="pitchForm.role" placeholder="Executive Tech Strategist" class="w-full px-3 py-2 text-xs bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Industri / Klien</label>
+                            <input type="text" v-model="pitchForm.target" placeholder="Perusahaan Skala Mulitnasional" class="w-full px-3 py-2 text-xs bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Nilai Keunikan Utama Anda</label>
+                            <input type="text" v-model="pitchForm.value" placeholder="Menggabungkan kepemimpinan manajerial dengan arsitektur sistem skala besar" class="w-full px-3 py-2 text-xs bg-dark-900 border border-gold-500/30 rounded-xl text-slate-100 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Outputs -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-dark-850 p-5 rounded-2xl border border-gold-500/30 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gold-400"><i class="fa-solid fa-stopwatch mr-1"></i> Pitch Networking (30 Detik)</span>
+                                <button @click="copyToClipboard(generatedPitch.networking)" class="text-xs text-gold-400 hover:underline">Salin</button>
+                            </div>
+                            <p class="text-xs text-slate-200 leading-relaxed font-medium">"{{ generatedPitch.networking }}"</p>
+                        </div>
+
+                        <div class="bg-dark-850 p-5 rounded-2xl border border-gold-500/30 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-gold-400"><i class="fa-brands fa-linkedin mr-1"></i> Tagline Bio LinkedIn</span>
+                                <button @click="copyToClipboard(generatedPitch.bio)" class="text-xs text-gold-400 hover:underline">Salin</button>
+                            </div>
+                            <p class="text-xs text-slate-200 leading-relaxed font-medium">"{{ generatedPitch.bio }}"</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= TAB 5: CETAK & EKSPOR PDF A4 ================= -->
+            <div v-if="activeTab === 'preview'" class="space-y-6">
+                <div class="no-print bg-dark-850 p-5 rounded-2xl border border-gold-500/30 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-cinzel text-base font-bold text-gold-gradient">Dokumen Cetak Standar A4</h2>
+                        <p class="text-xs text-slate-400">Halaman di bawah dikalibrasi khusus untuk disimpan ke PDF secara rapi.</p>
+                    </div>
+                    <button @click="triggerPrint" class="px-5 py-2.5 bg-gold-gradient text-black font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+                    </button>
+                </div>
+
+                <!-- Print A4 Container -->
+                <div class="printable bg-dark-950 p-6 rounded-2xl overflow-x-auto flex justify-center border border-gold-500/20">
+                    <div class="a4-sheet bg-white text-slate-900 shadow-2xl font-sans">
+                        
+                        <!-- Print Render Royalty Theme -->
+                        <div v-if="cvTheme === 'royalty'" class="space-y-4">
+                            <div class="border-b-2 border-gold-600 pb-4 flex justify-between items-center">
+                                <div>
+                                    <h1 class="font-cinzel text-2xl font-black text-slate-900 uppercase tracking-wider">{{ cv.personal.fullName || 'NAMA LENGKAP' }}</h1>
+                                    <p class="text-sm font-bold text-gold-700 tracking-wide mt-0.5">{{ cv.personal.title }}</p>
+                                </div>
+                                <div class="w-16 h-16 bg-black p-1 rounded border border-gold-500 flex items-center justify-center overflow-hidden" v-html="cv.personal.logoSvg || fallbackLogoSvg"></div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 pb-3 border-b border-slate-200">
+                                <span v-if="cv.personal.email">Email: {{ cv.personal.email }}</span>
+                                <span v-if="cv.personal.phone">• Tel: {{ cv.personal.phone }}</span>
+                                <span v-if="cv.personal.location">• Lokasi: {{ cv.personal.location }}</span>
+                                <span v-if="cv.personal.linkedin">• LinkedIn: {{ cv.personal.linkedin }}</span>
+                            </div>
+
+                            <div v-if="cv.personal.summary" class="mb-4">
+                                <h2 class="font-cinzel text-xs font-bold text-slate-900 uppercase border-b border-gold-600 pb-0.5 mb-1.5 tracking-wider">RINGKASAN EKSEKUTIF</h2>
+                                <p class="text-xs text-slate-800 leading-relaxed whitespace-pre-line">{{ cv.personal.summary }}</p>
+                            </div>
+
+                            <div v-if="cv.experiences.length" class="mb-4">
+                                <h2 class="font-cinzel text-xs font-bold text-slate-900 uppercase border-b border-gold-600 pb-0.5 mb-2 tracking-wider">PENGALAMAN KERJA</h2>
+                                <div class="space-y-3">
+                                    <div v-for="exp in cv.experiences" :key="exp.id">
+                                        <div class="flex justify-between font-bold text-xs text-slate-900">
+                                            <span>{{ exp.role }} — <span class="text-gold-700">{{ exp.company }}</span></span>
+                                            <span class="text-[10px] text-slate-500 font-normal">{{ exp.period }}</span>
+                                        </div>
+                                        <p class="text-xs text-slate-700 mt-1 whitespace-pre-line leading-relaxed">{{ exp.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="cv.education.length" class="mb-4">
+                                <h2 class="font-cinzel text-xs font-bold text-slate-900 uppercase border-b border-gold-600 pb-0.5 mb-2 tracking-wider">RIWAYAT PENDIDIKAN</h2>
+                                <div class="space-y-2 text-xs">
+                                    <div v-for="edu in cv.education" :key="edu.id" class="flex justify-between">
+                                        <div>
+                                            <span class="font-bold text-slate-900">{{ edu.degree }}</span>, {{ edu.institution }}
+                                            <span v-if="edu.score" class="text-slate-600 block text-[10px]">{{ edu.score }}</span>
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">{{ edu.period }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                <div v-if="cv.skills.length">
+                                    <h2 class="font-cinzel text-xs font-bold text-slate-900 uppercase border-b border-gold-600 pb-0.5 mb-1.5 tracking-wider">KEAHLIAN</h2>
+                                    <div class="space-y-1">
+                                        <div v-for="sk in cv.skills" :key="sk.id" class="flex justify-between text-slate-800">
+                                            <span>{{ sk.name }}</span>
+                                            <span class="text-slate-500 text-[10px]">{{ sk.level }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="cv.languages.length">
+                                    <h2 class="font-cinzel text-xs font-bold text-slate-900 uppercase border-b border-gold-600 pb-0.5 mb-1.5 tracking-wider">BAHASA</h2>
+                                    <div class="space-y-1">
+                                        <div v-for="lang in cv.languages" :key="lang.id" class="flex justify-between text-slate-800">
+                                            <span>{{ lang.name }}</span>
+                                            <span class="text-slate-500 text-[10px]">{{ lang.level }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Fallback Print Minimalist -->
+                        <div v-else class="space-y-4 font-serif">
+                            <div class="text-center pb-4 border-b border-slate-300">
+                                <h1 class="font-cinzel text-2xl font-bold uppercase">{{ cv.personal.fullName }}</h1>
+                                <p class="text-xs italic text-slate-600 mt-1">{{ cv.personal.title }}</p>
+                            </div>
+                            <div v-if="cv.experiences.length" class="space-y-3 font-sans">
+                                <h2 class="text-xs font-bold uppercase tracking-widest border-b pb-1">Pengalaman Kerja</h2>
+                                <div v-for="exp in cv.experiences" :key="exp.id" class="text-xs">
+                                    <div class="font-bold">{{ exp.role }} | {{ exp.company }}</div>
+                                    <p class="text-slate-700 whitespace-pre-line mt-1">{{ exp.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="no-print bg-dark-950 border-t border-gold-500/20 py-6 text-slate-500 text-xs text-center mt-auto">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p>&copy; 2026 BrandKraft ID - Luxury Edition. Integrated Career & AI Vector Suite.</p>
+                <div class="flex items-center space-x-4 text-gold-400">
+                    <span><i class="fa-solid fa-shield-halved mr-1"></i> Data Lokal Aman</span>
+                    <span><i class="fa-solid fa-vector-square mr-1"></i> Vektor AI SVG Ready</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Vue App & Script Logics -->
+    <script>
+        const { createApp, ref, reactive, computed } = Vue;
+
+        createApp({
+            setup() {
+                const activeTab = ref('cv');
+                const cvTheme = ref('royalty');
+                const canvasBg = ref('dark');
+                const geminiApiKey = ref('');
+                const isGeneratingLogo = ref(false);
+
+                const sections = reactive({
+                    personal: true,
+                    experience: true,
+                    education: true,
+                    skills: true
+                });
+
+                const toast = reactive({
+                    show: false,
+                    message: '',
+                    icon: 'fa-solid fa-circle-check'
+                });
+
+                const showToast = (msg, icon = 'fa-solid fa-circle-check') => {
+                    toast.message = msg;
+                    toast.icon = icon;
+                    toast.show = true;
+                    setTimeout(() => { toast.show = false; }, 3200);
+                };
+
+                // Default Fallback Logo SVG Code
+                const fallbackLogoSvg = ref(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2C5"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#996515"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="#0B0C10" rx="20"/>
+  <circle cx="100" cy="100" r="75" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <path d="M100 40 L125 80 L75 80 Z" fill="url(#goldGrad)"/>
+  <text x="100" y="135" font-family="'Cinzel', serif" font-size="42" font-weight="900" fill="url(#goldGrad)" text-anchor="middle">AV</text>
+</svg>`);
+
+                const currentSvg = ref(fallbackLogoSvg.value);
+
+                // Form Reactive State for Logo Generation
+                const logoForm = reactive({
+                    brandName: 'AV',
+                    tagline: 'LUXURY ARCHITECT',
+                    style: 'Monogram Luxury Crest',
+                    symbol: 'Mahkota / Perisai'
+                });
+
+                // CV Reactive State
+                const cv = reactive({
+                    personal: {
+                        fullName: 'Alexander Vance, M.B.A.',
+                        title: 'Chief Technology Officer & Tech Strategist',
+                        email: 'alexander@vance-executive.com',
+                        phone: '+62 811 8888 9999',
+                        location: 'Jakarta Selatan, Indonesia',
+                        photo: '',
+                        linkedin: 'linkedin.com/in/alexandervance',
+                        website: 'vance-executive.com',
+                        logoSvg: fallbackLogoSvg.value,
+                        summary: 'Pemimpin teknologi berdedikasi dengan 10+ tahun pengalaman memimpin transformasi digital, arsitektur cloud skala besar, dan pengelolaan tim engineering multinasional. Terbukti sukses meningkatkan ROI efisiensi operasional sebesar 45%.'
+                    },
+                    experiences: [
+                        {
+                            id: 1,
+                            role: 'Vice President of Engineering',
+                            company: 'Fintech Global Holdings',
+                            period: '2021 - Sekarang',
+                            description: '• Mengelola 40+ insinyur software dan arsitek cloud dalam mengembangkan ekosistem pembayaran terintegrasi.\n• Berhasil mengurangi latency transaksi hingga 60% dan mempertahankan uptime sistem 99.99%.'
+                        },
+                        {
+                            id: 2,
+                            role: 'Senior Principal Software Architect',
+                            company: 'Nusantara Digital Tech',
+                            period: '2017 - 2021',
+                            description: '• Merancang sistem arsitektur microservices berbasis Kubernetes untuk melayani 5 juta pengguna harian.'
+                        }
+                    ],
+                    education: [
+                        {
+                            id: 1,
+                            degree: 'Master of Business Administration (M.B.A.)',
+                            institution: 'Stanford Graduate School of Business',
+                            period: '2015 - 2017',
+                            score: 'GPA: 3.92 / 4.00'
+                        }
+                    ],
+                    skills: [
+                        { id: 1, name: 'Executive Tech Leadership', level: 'Ekspert' },
+                        { id: 2, name: 'Enterprise Cloud Architecture', level: 'Ekspert' },
+                        { id: 3, name: 'AI & Data Strategy', level: 'Mahir' }
+                    ],
+                    languages: [
+                        { id: 1, name: 'Bahasa Indonesia', level: 'Native' },
+                        { id: 2, name: 'Bahasa Inggris', level: 'Fasih (C2 Proficient)' }
+                    ]
+                });
+
+                // Cover Letter State
+                const letter = reactive({
+                    style: 'formal',
+                    date: '29 Oktober 2026',
+                    position: 'Chief Technology Officer',
+                    companyName: 'PT Global Enterprise Holdings',
+                    hrName: 'Dewan Direksi & Tim Rekrutmen',
+                    keyHighlight: 'Memiliki rekam jejak 10+ tahun dalam mengeksekusi transformasi arsitektur teknologi berskala nasional.'
+                });
+
+                // Pitch Generator State
+                const pitchForm = reactive({
+                    role: 'Chief Technology Officer',
+                    target: 'Perusahaan Skala Multinasional',
+                    value: 'Memadukan arsitektur cloud tingkat tinggi dengan strategi pertumbuhan bisnis terukur'
+                });
+
+                const generatedPitch = computed(() => {
+                    return {
+                        networking: `Halo, saya ${cv.personal.fullName}, bekerja sebagai ${pitchForm.role}. Saya membantu ${pitchForm.target} melalui ${pitchForm.value}.`,
+                        bio: `${pitchForm.role} | Membantu ${pitchForm.target} Mengakselerasi Pertumbuhan lewat ${pitchForm.value}.`
+                    };
+                });
+
+                const cvThemeName = computed(() => {
+                    if (cvTheme.value === 'royalty') return 'Royalty Gold';
+                    if (cvTheme.value === 'midnight') return 'Midnight Clean';
+                    if (cvTheme.value === 'accent') return 'Golden Accent';
+                    return '';
+                });
+
+                const canvasBgClass = computed(() => {
+                    if (canvasBg.value === 'dark') return 'bg-black';
+                    if (canvasBg.value === 'navy') return 'bg-dark-900';
+                    if (canvasBg.value === 'gold') return 'bg-gradient-to-br from-gold-900 via-dark-950 to-black';
+                    return 'bg-slate-900/40';
+                });
+
+                // Offline SVG Preset Engine
+                const generatePresetLogo = () => {
+                    const initials = (logoForm.brandName || 'AV').toUpperCase();
+                    const tagline = (logoForm.tagline || 'EXECUTIVE').toUpperCase();
+                    const style = logoForm.style;
+
+                    let svgBody = '';
+
+                    if (style === 'Monogram Luxury Crest') {
+                        svgBody = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2C5"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#8C6211"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="#0B0C10" rx="30"/>
+  <polygon points="150,25 240,75 240,225 150,275 60,225 60,75" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <circle cx="150" cy="150" r="95" fill="none" stroke="url(#gold)" stroke-width="2" stroke-dasharray="6 4"/>
+  <path d="M150 55 L165 85 L200 85 L170 105 L182 135 L150 115 L118 135 L130 105 L100 85 L135 85 Z" fill="url(#gold)"/>
+  <text x="150" y="185" font-family="'Cinzel', serif" font-size="52" font-weight="900" fill="url(#gold)" text-anchor="middle" letter-spacing="2">${initials}</text>
+  <text x="150" y="215" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#D4AF37" text-anchor="middle" letter-spacing="4">${tagline}</text>
+</svg>`;
+                    } else if (style === 'Geometric Minimalist Badge') {
+                        svgBody = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEBB0"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#996515"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="#07080A" rx="20"/>
+  <rect x="50" y="50" width="200" height="200" fill="none" stroke="url(#gold)" stroke-width="3" rx="15" transform="rotate(45 150 150)"/>
+  <circle cx="150" cy="150" r="65" fill="#0B0C10" stroke="url(#gold)" stroke-width="2"/>
+  <text x="150" y="162" font-family="'Cinzel', serif" font-size="44" font-weight="800" fill="url(#gold)" text-anchor="middle">${initials}</text>
+  <text x="150" y="245" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#E2E8F0" text-anchor="middle" letter-spacing="3">${tagline}</text>
+</svg>`;
+                    } else {
+                        svgBody = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFF2C5"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="#0B0C10" rx="20"/>
+  <circle cx="150" cy="120" r="70" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <text x="150" y="138" font-family="'Cinzel', serif" font-size="54" font-weight="900" fill="url(#gold)" text-anchor="middle">${initials}</text>
+  <line x1="80" y1="210" x2="220" y2="210" stroke="url(#gold)" stroke-width="2"/>
+  <text x="150" y="232" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#D4AF37" text-anchor="middle" letter-spacing="3">${tagline}</text>
+</svg>`;
+                    }
+
+                    currentSvg.value = svgBody;
+                    showToast('Preset Logo Vektor berhasil dibuat!');
+                };
+
+                // Gemini AI SVG Generator Call
+                const generateLogoWithAI = async () => {
+                    isGeneratingLogo.value = true;
+                    try {
+                        const apiKey = geminiApiKey.value || '';
+                        const systemPrompt = "You are a world-class SVG graphic designer specializing in luxury monogram vector logos. Generate ONLY raw valid SVG code. The palette MUST use luxury gold gradients (#D4AF37, #FFF2C5, #996515) and dark background (#0B0C10). Return ONLY the `<svg ... </svg>` code. Do not wrap in markdown or commentary if possible, or wrap in standard ```xml block.";
+                        
+                        const userQuery = `Create a high-end vector logo for Brand/Initials: "${logoForm.brandName}", Subtitle/Tagline: "${logoForm.tagline}", Design Style: "${logoForm.style}", Symbol Element: "${logoForm.symbol}". Keep SVG viewBox="0 0 300 300" and fully responsive.`;
+
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                        const payload = {
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        };
+
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+                        const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                        if (rawText) {
+                            // Clean SVG extraction from response
+                            let extractedSvg = rawText;
+                            if (extractedSvg.includes('<svg') && extractedSvg.includes('</svg>')) {
+                                const start = extractedSvg.indexOf('<svg');
+                                const end = extractedSvg.lastIndexOf('</svg>') + 6;
+                                extractedSvg = extractedSvg.substring(start, end);
+                            }
+                            currentSvg.value = extractedSvg;
+                            showToast('Logo Vektor AI berhasil di-generate dengan Gemini!');
+                        } else {
+                            // Fallback to preset engine if API fails or key is missing
+                            generatePresetLogo();
+                        }
+                    } catch (err) {
+                        console.warn('AI Generation fallback:', err);
+                        generatePresetLogo();
+                    } finally {
+                        isGeneratingLogo.value = false;
+                    }
+                };
+
+                // Apply Generated SVG directly to CV & Documents
+                const applyLogoToCV = () => {
+                    if (!currentSvg.value) return;
+                    cv.personal.logoSvg = currentSvg.value;
+                    showToast('Logo Vektor berhasil diterapkan pada CV & Dokumentasi!');
+                };
+
+                // Download SVG File
+                const downloadSVG = () => {
+                    if (!currentSvg.value) return;
+                    const blob = new Blob([currentSvg.value], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `BrandKraft_Logo_${logoForm.brandName.replace(/\s+/g, '_')}.svg`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('Berkas logo SVG berhasil diunduh!');
+                };
+
+                // Copy Raw SVG Code
+                const copySvgCode = () => {
+                    if (!currentSvg.value) return;
+                    copyToClipboard(currentSvg.value);
+                };
+
+                // Clipboard Helper
+                const copyToClipboard = (text) => {
+                    const dummy = document.createElement('textarea');
+                    document.body.appendChild(dummy);
+                    dummy.value = text;
+                    dummy.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(dummy);
+                    showToast('Teks disalin ke clipboard!');
+                };
+
+                const copyLetterToClipboard = () => {
+                    const text = `Hal: Lamaran Pekerjaan – ${letter.position}\n${cv.personal.location}, ${letter.date}\n\nKepada Yth.\n${letter.hrName}\n${letter.companyName}\n\nDengan hormat,\n\nSehubungan dengan lowongan ${letter.position} di ${letter.companyName}, saya bermaksud mengajukan diri.\n\n${letter.keyHighlight}\n\nHormat saya,\n${cv.personal.fullName}`;
+                    copyToClipboard(text);
+                };
+
+                // Dynamic Helpers for CV Collections
+                const addExperience = () => cv.experiences.push({ id: Date.now(), role: '', company: '', period: '', description: '' });
+                const removeExperience = (i) => cv.experiences.splice(i, 1);
+
+                const addEducation = () => cv.education.push({ id: Date.now(), degree: '', institution: '', period: '', score: '' });
+                const removeEducation = (i) => cv.education.splice(i, 1);
+
+                const addSkill = () => cv.skills.push({ id: Date.now(), name: '', level: 'Mahir' });
+                const removeSkill = (i) => cv.skills.splice(i, 1);
+
+                const addLanguage = () => cv.languages.push({ id: Date.now(), name: '', level: 'Fasih' });
+                const removeLanguage = (i) => cv.languages.splice(i, 1);
+
+                // JSON Draft Import/Export
+                const exportJSON = () => {
+                    const data = { cv, letter, pitchForm, logoForm, cvTheme: cvTheme.value, currentSvg: currentSvg.value };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `BrandKraft_Draft_${cv.personal.fullName.replace(/\s+/g, '_')}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('Draf JSON berhasil disimpan!');
+                };
+
+                const importJSON = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const parsed = JSON.parse(e.target.result);
+                            if (parsed.cv) Object.assign(cv, parsed.cv);
+                            if (parsed.letter) Object.assign(letter, parsed.letter);
+                            if (parsed.pitchForm) Object.assign(pitchForm, parsed.pitchForm);
+                            if (parsed.logoForm) Object.assign(logoForm, parsed.logoForm);
+                            if (parsed.cvTheme) cvTheme.value = parsed.cvTheme;
+                            if (parsed.currentSvg) currentSvg.value = parsed.currentSvg;
+                            showToast('Draf data berhasil diimpor!');
+                        } catch (err) {
+                            showToast('Format berkas tidak valid!', 'fa-solid fa-triangle-exclamation');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+
+                const triggerPrint = () => window.print();
+
+                return {
+                    activeTab,
+                    cvTheme,
+                    cvThemeName,
+                    canvasBg,
+                    canvasBgClass,
+                    geminiApiKey,
+                    isGeneratingLogo,
+                    sections,
+                    toast,
+                    cv,
+                    letter,
+                    pitchForm,
+                    generatedPitch,
+                    logoForm,
+                    currentSvg,
+                    fallbackLogoSvg,
+                    generatePresetLogo,
+                    generateLogoWithAI,
+                    applyLogoToCV,
+                    downloadSVG,
+                    copySvgCode,
+                    copyToClipboard,
+                    copyLetterToClipboard,
+                    addExperience,
+                    removeExperience,
+                    addEducation,
+                    removeEducation,
+                    addSkill,
+                    removeSkill,
+                    addLanguage,
+                    removeLanguage,
+                    exportJSON,
+                    importJSON,
+                    triggerPrint
+                };
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+</html>
